@@ -9,6 +9,9 @@
     "coverage": "nyc --reporter html tape test/*.test.js && opener coverage/index.html",
     "docs": "documentation readme index.js --section=API > /dev/null"
   },
+  "bin": {
+    "sumo": "bin/sumo.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mapbox/sumo.git"
@@ -29,6 +32,7 @@
     "tape": "^4.6.3"
   },
   "dependencies": {
-    "got": "^6.7.1"
+    "got": "^6.7.1",
+    "meow": "^3.7.0"
   }
 }
