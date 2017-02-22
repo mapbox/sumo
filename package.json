@@ -1,0 +1,34 @@
+{
+  "name": "@mapbox/sumo",
+  "version": "1.0.0",
+  "description": "A Node.js SDK for Sumo Logic's Search Job API",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint index.js test lib",
+    "test": "nyc tape test/*.test.js | tap-spec",
+    "coverage": "nyc --reporter html tape test/*.test.js && opener coverage/index.html",
+    "docs": "documentation readme index.js --section=API > /dev/null"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mapbox/sumo.git"
+  },
+  "author": "Mapbox",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/sumo/issues"
+  },
+  "homepage": "https://github.com/mapbox/sumo#readme",
+  "devDependencies": {
+    "aws-sdk": "^2.16.0",
+    "eslint": "^3.16.0",
+    "eslint-plugin-node": "^4.0.1",
+    "nyc": "^10.1.2",
+    "opener": "^1.4.3",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.3"
+  },
+  "dependencies": {
+    "got": "^6.7.1"
+  }
+}
