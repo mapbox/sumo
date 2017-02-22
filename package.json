@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/mapbox/sumo#readme",
   "devDependencies": {
-    "aws-sdk": "^2.16.0",
     "eslint": "^3.16.0",
     "eslint-plugin-node": "^4.0.1",
     "nyc": "^10.1.2",

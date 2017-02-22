@@ -16,7 +16,7 @@ const cli = meow({
     -q, --query     the query string
     -f, --from      the starting time, defaults to 15 minutes ago
     -t, --to        the ending time, defaults to now
-    -d, --duration  the amount of time to search, starting from --from
+    -d, --duration  the amount of time to search, starting at --from
     -g, --grouped   print aggregate search results, not raw log messages
     -a, --all       when printing raw log messages, print as JSON string. Without
                     this flag, only the log message itself will print. With it,
