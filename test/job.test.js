@@ -46,11 +46,18 @@ test('[job] status polling', (assert) => {
   const from = Date.now() - 5 * 60 * 1000;
   const to = Date.now();
 
+  let gotMessages = false;
+  let gotRecords = false;
+
   auth()
     .then((data) => Job.create(data, query, from, to))
     .then((job) => new Promise((resolve) => {
       console.log('waiting for query to complete...');
+      job.once('messages', () => gotMessages = true);
+      job.once('records', () => gotRecords = true);
       job.once('completed', () => {
+        assert.ok(gotMessages, 'fired messages event');
+        assert.ok(gotRecords, 'fired records event');
         assert.equal(job.status.state, 'DONE GATHERING RESULTS', 'status polling has adjusted job state and emitted done event');
         resolve();
       });
@@ -72,24 +79,22 @@ test('[job] messages', (assert) => {
       return job.fetchMessages(10);
     })
     .then((data) => {
-      assert.ok(Array.isArray(data.fields), 'returns message fields');
-      assert.ok(Array.isArray(data.messages), 'returns messages');
+      assert.ok(Array.isArray(data), 'returns array of messages');
+      const fields = Object.keys(data[0]);
+      const messages = data;
 
-      const messages = data.messages.map((message) => message.map);
-      assert.deepEqual(searchJob.messageFields, data.fields, 'sets messageFields on job');
+      assert.equal(Object.keys(searchJob.messageFields).length, fields.length, 'sets messageFields on job');
       assert.deepEqual(searchJob.messages, messages, 'buffers messages in job array');
       assert.equal(searchJob.messageOffset, messages.length, 'updates job messageOffset');
       firstOffset = searchJob.messageOffset;
       return searchJob.fetchMessages(10);
     })
     .then((data) => {
-      data.messages
-        .map((message) => message.map)
-        .forEach((message, i) => {
-          assert.notDeepEqual(message, searchJob[i], `pagination returns a new message ${i}`);
-          assert.deepEqual(message, searchJob.messages[firstOffset + i], `message ${i} from 2nd request landed in messages buffer`);
-        });
-      assert.equal(searchJob.messageOffset, firstOffset + data.messages.length, 'updates job messageOffset');
+      data.forEach((message, i) => {
+        assert.notDeepEqual(message, searchJob[i], `pagination returns a new message ${i}`);
+        assert.deepEqual(message, searchJob.messages[firstOffset + i], `message ${i} from 2nd request landed in messages buffer`);
+      });
+      assert.equal(searchJob.messageOffset, firstOffset + data.length, 'updates job messageOffset');
     })
     .catch((err) => assert.ifError(err, 'test failed'))
     .then(() => assert.end());
@@ -108,24 +113,22 @@ test('[job] records', (assert) => {
       return job.fetchRecords(10);
     })
     .then((data) => {
-      assert.ok(Array.isArray(data.fields), 'returns record fields');
-      assert.ok(Array.isArray(data.records), 'returns records');
+      assert.ok(Array.isArray(data), 'returns array of records');
+      const fields = Object.keys(data[0]);
+      const records = data;
 
-      const records = data.records.map((record) => record.map);
-      assert.deepEqual(searchJob.recordFields, data.fields, 'sets recordFields on job');
+      assert.deepEqual(Object.keys(searchJob.recordFields).length, fields.length, 'sets recordFields on job');
       assert.deepEqual(searchJob.records, records, 'buffers records in job array');
       assert.equal(searchJob.recordOffset, records.length, 'updates job recordOffset');
       firstOffset = searchJob.recordOffset;
       return searchJob.fetchRecords(10);
     })
     .then((data) => {
-      data.records
-        .map((record) => record.map)
-        .forEach((record, i) => {
-          assert.notDeepEqual(record, searchJob[i], `pagination returns a new record ${i}`);
-          assert.deepEqual(record, searchJob.records[firstOffset + i], `record ${i} from 2nd request landed in records buffer`);
-        });
-      assert.equal(searchJob.recordOffset, firstOffset + data.records.length, 'updates job recordOffset');
+      data.forEach((record, i) => {
+        assert.notDeepEqual(record, searchJob[i], `pagination returns a new record ${i}`);
+        assert.deepEqual(record, searchJob.records[firstOffset + i], `record ${i} from 2nd request landed in records buffer`);
+      });
+      assert.equal(searchJob.recordOffset, firstOffset + data.length, 'updates job recordOffset');
     })
     .catch((err) => assert.ifError(err, 'test failed'))
     .then(() => assert.end());

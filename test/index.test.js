@@ -85,8 +85,8 @@ test('[index] search w/o callback, provided auth, no limit', (assert) => {
     search.auth = data;
     return sumo.search(search);
   }).then((data) => {
-    assert.equal(data.messages.length, 100, 'returned 100 messages');
-    assert.equal(data.records.length, 100, 'returned 100 records');
+    assert.equal(data.messages.length, 10000, 'returned 10000 messages');
+    assert.ok(data.records.length > 100, 'returned at least 100 records');
   }).catch((err) => assert.ifError(err, 'test failed'))
     .then(() => assert.end());
 });
@@ -107,6 +107,30 @@ test('[index] search w/callback, auth from env, provided limit', (assert) => {
       assert.ifError(err, 'success');
       assert.equal(data.messages.length, 10, 'returned 10 messages');
       assert.equal(data.records.length, 10, 'returned 10 records');
+      delete process.env.SUMO_LOGIC_ACCESS_ID;
+      delete process.env.SUMO_LOGIC_ACCESS_KEY;
+      assert.end();
+    });
+  });
+});
+
+test('[index] search w/o aggregation', (assert) => {
+  const search = {
+    query: '"error"',
+    from: Date.now() - 1 * 60 * 1000,
+    to: Date.now(),
+    limit: 10
+  };
+
+  auth().then((data) => {
+    process.env.SUMO_LOGIC_ACCESS_ID = data.accessId;
+    process.env.SUMO_LOGIC_ACCESS_KEY = data.accessKey;
+
+    sumo.search(search, (err, data) => {
+      assert.ifError(err, 'success');
+      assert.equal(data.messages.length, 10, 'returned 10 messages');
+      assert.equal(data.records.length, 0, 'returned 0 records');
+
       delete process.env.SUMO_LOGIC_ACCESS_ID;
       delete process.env.SUMO_LOGIC_ACCESS_KEY;
       assert.end();

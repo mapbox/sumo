@@ -49,7 +49,7 @@ module.exports.createReadStream = (type, search, options) => {
 };
 
 /**
- * Perform a search limited to less that 100 results. This will return both
+ * Perform a search limited to up to 10,000 results. This will return both
  * raw messages and aggregate records where applicable. Credentials can be
  * provided explicitly, or read from environment variables:
  * `SUMO_LOGIC_ACCESS_ID` and `SUMO_LOGIC_ACCESS_KEY`.
@@ -58,7 +58,7 @@ module.exports.createReadStream = (type, search, options) => {
  * @param {string} search.query - the query string
  * @param {number} search.from - the starting timestamp in ms
  * @param {number} search.to - the ending timestamp in ms
- * @param {number} [search.limit=100] - the maximum number of messages/records
+ * @param {number} [search.limit=10000] - the maximum number of messages/records
  * @param {object} [search.auth] - Sumo Logic credentials
  * @param {string} [search.auth.accessId] - Sumo Logic access ID
  * @param {string} [search.auth.accessKey] - Sumo Logic access key
@@ -86,8 +86,8 @@ module.exports.createReadStream = (type, search, options) => {
 module.exports.search = (search, callback) => {
   callback = callback || function() {};
 
-  search.limit = search.limit || 100;
-  const limit = Math.min(100, search.limit);
+  search.limit = search.limit || 10000;
+  const limit = Math.min(10000, search.limit);
 
   if (!search.auth) search.auth = {
     accessId: process.env.SUMO_LOGIC_ACCESS_ID,
@@ -99,14 +99,28 @@ module.exports.search = (search, callback) => {
     search.query,
     search.from,
     search.to
-  ).then((job) => Promise.all([
-    job.fetchMessages(limit),
-    job.fetchRecords(limit),
-    Promise.resolve(job)
-  ])).then((results) => {
+  ).then((job) => {
+    let hasRecords = false;
+
+    const getRecords = new Promise((resolve) => {
+      job.once('records', () => {
+        hasRecords = true;
+        return job.fetchRecords(limit)
+          .then((records) => resolve(records));
+      });
+      job.once('completed', () => {
+        if (!hasRecords) resolve([]);
+      });
+    });
+
+    return Promise.all([
+      job.fetchMessages(limit),
+      getRecords
+    ]);
+  }).then((results) => {
     const data = {
-      messages: results[2].messages,
-      records: results[2].records
+      messages: results[0],
+      records: results[1]
     };
     callback(null, data);
     return Promise.resolve(data);
