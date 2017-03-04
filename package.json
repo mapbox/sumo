@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/sumo",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A Node.js SDK for Sumo Logic's Search Job API",
   "main": "index.js",
   "scripts": {
