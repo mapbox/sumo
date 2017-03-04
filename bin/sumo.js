@@ -18,7 +18,7 @@ const cli = meow({
     -t, --to        the ending time, defaults to now
     -d, --duration  the amount of time to search, starting at --from
     -g, --grouped   print aggregate search results, not raw log messages
-    -a, --all       when printing raw log messages, print as JSON string. Without
+    -j, --json      when printing raw log messages, print as JSON string. Without
                     this flag, only the log message itself will print. With it,
                     all Sumo Logic fields will be provided
 
@@ -34,7 +34,7 @@ const cli = meow({
   `,
   description: 'Search Sumo Logic'
 }, {
-  alias: { q: 'query', f: 'from', t: 'to', g: 'grouped', d: 'duration', a: 'all' },
+  alias: { q: 'query', f: 'from', t: 'to', g: 'grouped', d: 'duration', j: 'json' },
   boolean: ['grouped', 'all'],
   string: ['query', 'from', 'to', 'duration']
 });
@@ -84,7 +84,7 @@ if (cli.flags.duration) {
 const stringify = new stream.Transform({
   objectMode: true,
   transform: function(obj, enc, callback) {
-    if (cli.flags.grouped || cli.flags.all)
+    if (cli.flags.grouped || cli.flags.json)
       return callback(null, `${JSON.stringify(obj)}\n`);
     callback(null, `${obj._raw.trim()}\n`);
   }
