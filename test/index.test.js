@@ -137,3 +137,27 @@ test('[index] search w/o aggregation', (assert) => {
     });
   });
 });
+
+test('[index] search with no results', (assert) => {
+  const search = {
+    query: '"piping hot banana blueberry pancakes"',
+    from: Date.now() - 1 * 60 * 1000,
+    to: Date.now(),
+    limit: 10
+  };
+
+  auth().then((data) => {
+    process.env.SUMO_LOGIC_ACCESS_ID = data.accessId;
+    process.env.SUMO_LOGIC_ACCESS_KEY = data.accessKey;
+
+    sumo.search(search, (err, data) => {
+      assert.ifError(err, 'success');
+      assert.equal(data.messages.length, 0, 'returned 0 messages');
+      assert.equal(data.records.length, 0, 'returned 0 records');
+
+      delete process.env.SUMO_LOGIC_ACCESS_ID;
+      delete process.env.SUMO_LOGIC_ACCESS_KEY;
+      assert.end();
+    });
+  });
+});
