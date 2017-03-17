@@ -1,0 +1,61 @@
+'use strict';
+
+module.exports = [
+  {
+    'region': '',
+    '_receipttime': '1489789415360',
+    '_source': 'LambdaLoggingLambda',
+    '_collector': 'Lambda Logs',
+    '_format': 'plain:atp:o:6:l:20:p:dd MMM yyyy HH:mm:ss',
+    '_blockid': '-9223372036680302616',
+    '_messageid': '-9223371132277807423',
+    '_messagetime': '1489789411000',
+    '_collectorid': '119077214',
+    '_sourcename': 'api-events-production/api-events/516b758a-58de-4b0b-b5be-4d86b86a0601',
+    '_sourcehost': '54.197.44.126',
+    '_raw': '[Fri, 17 Mar 2017 22:23:31 GMT] [warn] [default] express error { [Error: Invalid time range.] message: \'Invalid time range.\', status: 422 }',
+    '_size': '139',
+    '_sourcecategory': 'api-events-production-us-east-1-3c7309fd7d4cc92c0f9d85e6a24eb17176d56b11',
+    '_sourceid': '247789189',
+    'stack': '',
+    '_messagecount': '1'
+  },
+  {
+    'region': '',
+    '_receipttime': '1489789413981',
+    '_source': 'LambdaLoggingLambda',
+    '_collector': 'Lambda Logs',
+    '_format': 'plain:atp:o:6:l:20:p:dd MMM yyyy HH:mm:ss',
+    '_blockid': '-9223372036680456167',
+    '_messageid': '-9223371132312026434',
+    '_messagetime': '1489789411000',
+    '_collectorid': '119077214',
+    '_sourcename': 'api-events-production/api-events/415851ce-30c5-4fff-982a-137a3c27dddd',
+    '_sourcehost': '34.251.166.155',
+    '_raw': '[Fri, 17 Mar 2017 22:23:31 GMT] [warn] [default] express error { [Error: Unauthorized] message: \'Unauthorized\', status: 401 }',
+    '_size': '125',
+    '_sourcecategory': 'api-events-production-eu-west-1-3c7309fd7d4cc92c0f9d85e6a24eb17176d56b11',
+    '_sourceid': '247789189',
+    'stack': '',
+    '_messagecount': '1'
+  },
+  {
+    'region': '',
+    '_receipttime': '1489789417406',
+    '_source': 'LambdaLoggingLambda',
+    '_collector': 'Lambda Logs',
+    '_format': 'plain:atp:o:6:l:20:p:dd MMM yyyy HH:mm:ss',
+    '_blockid': '-9223372036680302390',
+    '_messageid': '-9223371132273314654',
+    '_messagetime': '1489789411000',
+    '_collectorid': '119077214',
+    '_sourcename': 'api-events-production/api-events/04735bd6-94bd-48fa-a62f-b3a2b66f5698',
+    '_sourcehost': '52.91.204.83',
+    '_raw': '[Fri, 17 Mar 2017 22:23:31 GMT] [warn] [default] express error { [Error: Unauthorized] message: \'Unauthorized\', status: 401 }',
+    '_size': '125',
+    '_sourcecategory': 'api-events-production-us-east-1-3c7309fd7d4cc92c0f9d85e6a24eb17176d56b11',
+    '_sourceid': '247789189',
+    'stack': '',
+    '_messagecount': '1'
+  }
+];
