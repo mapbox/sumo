@@ -32,14 +32,12 @@ test('[validate]', (t) => {
   t.equal(error.getCall(2).args[0], 'ERROR: --query and --from are required');
 
   /* No accessId */
-  process.env.SUMO_LOGIC_ACCESS_ID =
-  process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_ID = '';
+  process.env.SUMO_LOGIC_ACCESS_ID = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_ID = '';
   file.validate({ showHelp: showHelp, flags: { query: 'error', from: '10m' } });
   t.equal(error.getCall(3).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY');
 
   /* No accessKey */
-  process.env.SUMO_LOGIC_ACCESS_KEY =
-  process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_KEY = '';
+  process.env.SUMO_LOGIC_ACCESS_KEY = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_KEY = '';
   file.validate({ showHelp: showHelp, flags: { query: 'error', from: '10m' } });
   t.equal(error.getCall(4).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY');
 
