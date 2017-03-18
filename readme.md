@@ -86,3 +86,42 @@ sumo.search(search, (err, data) => {
 
 Returns **[promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** resolves with the results, an object with two properties,
 each of which are an array: `.messages` and `.records`
+
+## CLI
+
+A CLI command is available to run Sumo Logic queries via the command line.
+
+```
+$ sumo --help
+
+  Search Sumo Logic
+
+  USAGE: sumo [OPTIONS]
+
+  Options:
+    -q, --query     the query string
+    -f, --from      the starting time, defaults to 15 minutes ago
+    -t, --to        the ending time, defaults to now
+    -d, --duration  the amount of time to search, starting at --from
+    -g, --grouped   print aggregate search results, not raw log messages
+    -j, --json      when printing raw log messages, print as JSON string. Without
+                    this flag, only the log message itself will print. With it,
+                    all Sumo Logic fields will be provided
+
+  Configuration:
+    SUMO_LOGIC_ACCESS_ID and SUMO_LOGIC_ACCESS_KEY must be set as environment
+    variables.
+
+  Specifying times
+    --from 1s = one second ago
+    --from 5m = five minutes ago
+    --from 2h = two hours ago
+    --from 1d = one day ago
+```
+
+The following are required to successfully use the CLI:
+
+* SUMO_LOGIC_ACCESS_ID environment variable
+* SUMO_LOGIC_ACCESS_KEY environment variable
+* `-q or --query` flag
+* `-f or --from` flag
