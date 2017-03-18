@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/mapbox/sumo#readme",
   "devDependencies": {
+    "d3-queue": "^3.0.5",
     "eslint": "^3.16.0",
     "eslint-plugin-node": "^4.0.1",
     "nyc": "^10.1.2",
