@@ -17,29 +17,33 @@ const realMbxKey = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_KEY;
 
 test('[validate]', (t) => {
   const error = sinon.stub(console, 'error');
-  function showHelp(number) { t.equal(number, 1); }
+  let count = 0;
+  function showHelp(number) {
+    t.equal(number, 1, `[${count}/4] cli.showHelp should be called with a 1`);
+    count++;
+  }
 
   /* No flags */
   file.validate({ showHelp: showHelp, flags: {} });
-  t.equal(error.getCall(0).args[0], 'ERROR: --query and --from are required');
+  t.equal(error.getCall(0).args[0], 'ERROR: --query and --from are required', 'no flags should print validation error message');
 
   /* No --from flag */
   file.validate({ showHelp: showHelp, flags: { query: 'error' } });
-  t.equal(error.getCall(1).args[0], 'ERROR: --query and --from are required');
+  t.equal(error.getCall(1).args[0], 'ERROR: --query and --from are required', 'no --from flag should print validation error message');
 
   /* No --query flag */
   file.validate({ showHelp: showHelp, flags: { from: '10m' } });
-  t.equal(error.getCall(2).args[0], 'ERROR: --query and --from are required');
+  t.equal(error.getCall(2).args[0], 'ERROR: --query and --from are required', 'no --query flag should print validation error message');
 
   /* No accessId */
   process.env.SUMO_LOGIC_ACCESS_ID = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_ID = '';
   file.validate({ showHelp: showHelp, flags: { query: 'error', from: '10m' } });
-  t.equal(error.getCall(3).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY');
+  t.equal(error.getCall(3).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY', 'no accessId should print validation error message');
 
   /* No accessKey */
   process.env.SUMO_LOGIC_ACCESS_KEY = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_KEY = '';
   file.validate({ showHelp: showHelp, flags: { query: 'error', from: '10m' } });
-  t.equal(error.getCall(4).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY');
+  t.equal(error.getCall(4).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY', 'no accessKey should print validation error message');
 
   restore();
   t.end();
@@ -73,52 +77,52 @@ test('[sumoStream]', (t) => {
   /* --query and --from */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m' } });
   let args = createReadStream.getCall(0).args;
-  t.equal(args[0], 'messages');
-  t.deepEqual(args[1].auth, auth);
-  t.equal(args[1].query, 'error');
-  t.ok(/^\d{13}$/.test(args[1].from));
-  t.ok(/^\d{13}$/.test(args[1].to));
-  t.equal(args[1].to - args[1].from, 600000);
+  t.equal(args[0], 'messages', '[0/4] createReadStream first parameter should be \'messages\'');
+  t.deepEqual(args[1].auth, auth, '[0/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
+  t.equal(args[1].query, 'error', '[0/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
+  t.ok(/^\d{13}$/.test(args[1].from), '[0/4] createReadStream second parameter should contain \'from\' property with timestamp');
+  t.ok(/^\d{13}$/.test(args[1].to), '[0/4] createReadStream second parameter should contain \'to\' property with timestamp');
+  t.equal(args[1].to - args[1].from, 600000, '[0/4] difference between \'from\' and \'to\' properties should be 10m');
 
   /* --query, --from, and --duration */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', duration: '5m' } });
   args = createReadStream.getCall(1).args;
-  t.equal(args[0], 'messages');
-  t.deepEqual(args[1].auth, auth);
-  t.equal(args[1].query, 'error');
-  t.ok(/^\d{13}$/.test(args[1].from));
-  t.ok(/^\d{13}$/.test(args[1].to));
-  t.equal(args[1].to - args[1].from, 300000);
+  t.equal(args[0], 'messages', '[1/4] createReadStream first parameter should be \'messages\'');
+  t.deepEqual(args[1].auth, auth, '[1/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
+  t.equal(args[1].query, 'error', '[1/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
+  t.ok(/^\d{13}$/.test(args[1].from), '[1/4] createReadStream second parameter should contain \'from\' property with timestamp');
+  t.ok(/^\d{13}$/.test(args[1].to), '[1/4] createReadStream second parameter should contain \'to\' property with timestamp');
+  t.equal(args[1].to - args[1].from, 300000, '[1/4] difference between \'from\' and \'to\' properties should be 5m');
 
   /* --query, --from, and --to */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', to: '2m' } });
   args = createReadStream.getCall(2).args;
-  t.equal(args[0], 'messages');
-  t.deepEqual(args[1].auth, auth);
-  t.equal(args[1].query, 'error');
-  t.ok(/^\d{13}$/.test(args[1].from));
-  t.ok(/^\d{13}$/.test(args[1].to));
-  t.equal(args[1].to - args[1].from, 480000);
+  t.equal(args[0], 'messages', '[2/4] createReadStream first parameter should be \'messages\'');
+  t.deepEqual(args[1].auth, auth, '[2/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
+  t.equal(args[1].query, 'error', '[2/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
+  t.ok(/^\d{13}$/.test(args[1].from), '[2/4] createReadStream second parameter should contain \'from\' property with timestamp');
+  t.ok(/^\d{13}$/.test(args[1].to), '[2/4] createReadStream second parameter should contain \'to\' property with timestamp');
+  t.equal(args[1].to - args[1].from, 480000, '[2/4] difference between \'from\' and \'to\' properties should be 8m');
 
   /* --query, --from, and --json */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', json: true } });
   args = createReadStream.getCall(3).args;
-  t.equal(args[0], 'messages');
-  t.deepEqual(args[1].auth, auth);
-  t.equal(args[1].query, 'error');
-  t.ok(/^\d{13}$/.test(args[1].from));
-  t.ok(/^\d{13}$/.test(args[1].to));
-  t.equal(args[1].to - args[1].from, 600000);
+  t.equal(args[0], 'messages', '[3/4] createReadStream first parameter should be \'messages\'');
+  t.deepEqual(args[1].auth, auth, '[3/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
+  t.equal(args[1].query, 'error', '[3/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
+  t.ok(/^\d{13}$/.test(args[1].from), '[3/4] createReadStream second parameter should contain \'from\' property with timestamp');
+  t.ok(/^\d{13}$/.test(args[1].to), '[3/4] createReadStream second parameter should contain \'to\' property with timestamp');
+  t.equal(args[1].to - args[1].from, 600000, '[3/4] difference between \'from\' and \'to\' properties should be 10m');
 
   /* --query, --from, and --grouped */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', grouped: true } });
   args = createReadStream.getCall(4).args;
-  t.equal(args[0], 'records');
-  t.deepEqual(args[1].auth, auth);
-  t.equal(args[1].query, 'error');
-  t.ok(/^\d{13}$/.test(args[1].from));
-  t.ok(/^\d{13}$/.test(args[1].to));
-  t.equal(args[1].to - args[1].from, 600000);
+  t.equal(args[0], 'records', '[4/4] createReadStream first parameter should be \'records\'');
+  t.deepEqual(args[1].auth, auth, '[4/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
+  t.equal(args[1].query, 'error', '[4/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
+  t.ok(/^\d{13}$/.test(args[1].from), '[4/4] createReadStream second parameter should contain \'from\' property with timestamp');
+  t.ok(/^\d{13}$/.test(args[1].to), '[4/4] createReadStream second parameter should contain \'to\' property with timestamp');
+  t.equal(args[1].to - args[1].from, 600000, '[4/4] difference between \'from\' and \'to\' properties should be 10m');
 
   sumo.createReadStream.restore();
   t.end();
@@ -133,7 +137,12 @@ test('[format] json', (t) => {
 
   q.awaitAll((err, res) => {
     t.ifError(err, 'should not error');
-    res.forEach((r) => { t.ok(JSON.parse(r), 'should be JSON-parsable'); });
+
+    let count = 0;
+    res.forEach((r) => {
+      t.ok(JSON.parse(r), `[${count}/5] should be JSON-parsable`);
+      count++;
+    });
     t.end();
   });
 });
@@ -146,10 +155,13 @@ test('[format] string', (t) => {
 
   q.awaitAll((err, res) => {
     t.ifError(err, 'should not error');
+
+    let count = 0;
     res.forEach((r) => {
-      t.ok(/^\S.*\S\n$/.test(r), 'should not have leading or trailing whitespaces');
+      t.ok(/^\S.*\S\n$/.test(r), `[${count}/2] should not have leading or trailing whitespaces`);
       try { JSON.parse(r); }
-      catch (err) { t.equal(err.message, 'Unexpected token F', 'not JSON-parsable'); }
+      catch (err) { t.equal(err.message, 'Unexpected token F', `[${count}/2] not JSON-parsable`); }
+      count++;
     });
     t.end();
   });
