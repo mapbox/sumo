@@ -74,20 +74,9 @@ test('[sumoStream]', (t) => {
   let count = 0;
   const total = 5;
 
-  /* --query */
-  file.sumoStream(auth, { flags: { query: 'error' } });
-  let args = createReadStream.getCall(0).args;
-  t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
-  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
-  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
-  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
-  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
-  t.equal(args[1].to - args[1].from, 15 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 10m`);
-  count++;
-
   /* --query and --from */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m' } });
-  args = createReadStream.getCall(1).args;
+  let args = createReadStream.getCall(count).args;
   t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
   t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
   t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
@@ -98,7 +87,7 @@ test('[sumoStream]', (t) => {
 
   /* --query, --from, and --duration */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', duration: '5m' } });
-  args = createReadStream.getCall(2).args;
+  args = createReadStream.getCall(count).args;
   t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
   t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
   t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
@@ -109,7 +98,7 @@ test('[sumoStream]', (t) => {
 
   /* --query, --from, and --to */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', to: '2m' } });
-  args = createReadStream.getCall(3).args;
+  args = createReadStream.getCall(count).args;
   t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
   t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
   t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
@@ -120,7 +109,7 @@ test('[sumoStream]', (t) => {
 
   /* --query, --from, and --json */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', json: true } });
-  args = createReadStream.getCall(4).args;
+  args = createReadStream.getCall(count).args;
   t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
   t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
   t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
@@ -131,7 +120,7 @@ test('[sumoStream]', (t) => {
 
   /* --query, --from, and --grouped */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', grouped: true } });
-  args = createReadStream.getCall(5).args;
+  args = createReadStream.getCall(count).args;
   t.equal(args[0], 'records', `[${count}/${total}] createReadStream first parameter should be \'records\'`);
   t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
   t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);

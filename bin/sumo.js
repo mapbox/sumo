@@ -36,7 +36,10 @@ const cli = meow({
 }, {
   alias: { q: 'query', f: 'from', t: 'to', g: 'grouped', d: 'duration', j: 'json' },
   boolean: ['grouped', 'all'],
-  string: ['query', 'from', 'to', 'duration']
+  string: ['query', 'from', 'to', 'duration'],
+  default: {
+    from: '15m'
+  }
 });
 
 const auth = validate(cli);
