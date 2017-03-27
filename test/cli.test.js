@@ -25,25 +25,21 @@ test('[validate]', (t) => {
 
   /* No flags */
   file.validate({ showHelp: showHelp, flags: {} });
-  t.equal(error.getCall(0).args[0], 'ERROR: --query and --from are required', 'no flags should print validation error message');
-
-  /* No --from flag */
-  file.validate({ showHelp: showHelp, flags: { query: 'error' } });
-  t.equal(error.getCall(1).args[0], 'ERROR: --query and --from are required', 'no --from flag should print validation error message');
+  t.equal(error.getCall(0).args[0], 'ERROR: --query is required', 'no flags should print validation error message');
 
   /* No --query flag */
   file.validate({ showHelp: showHelp, flags: { from: '10m' } });
-  t.equal(error.getCall(2).args[0], 'ERROR: --query and --from are required', 'no --query flag should print validation error message');
+  t.equal(error.getCall(1).args[0], 'ERROR: --query is required', 'no --query flag should print validation error message');
 
   /* No accessId */
   process.env.SUMO_LOGIC_ACCESS_ID = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_ID = '';
   file.validate({ showHelp: showHelp, flags: { query: 'error', from: '10m' } });
-  t.equal(error.getCall(3).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY', 'no accessId should print validation error message');
+  t.equal(error.getCall(2).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY', 'no accessId should print validation error message');
 
   /* No accessKey */
   process.env.SUMO_LOGIC_ACCESS_KEY = process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_KEY = '';
   file.validate({ showHelp: showHelp, flags: { query: 'error', from: '10m' } });
-  t.equal(error.getCall(4).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY', 'no accessKey should print validation error message');
+  t.equal(error.getCall(3).args[0], 'ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY', 'no accessKey should print validation error message');
 
   restore();
   t.end();
@@ -74,55 +70,75 @@ test('[sumoStream]', (t) => {
     return readable;
   });
 
+  /* Test count trackers */
+  let count = 0;
+  const total = 5;
+
+  /* --query */
+  file.sumoStream(auth, { flags: { query: 'error' } });
+  let args = createReadStream.getCall(0).args;
+  t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
+  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
+  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
+  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
+  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
+  t.equal(args[1].to - args[1].from, 15 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 10m`);
+  count++;
+
   /* --query and --from */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m' } });
-  let args = createReadStream.getCall(0).args;
-  t.equal(args[0], 'messages', '[0/4] createReadStream first parameter should be \'messages\'');
-  t.deepEqual(args[1].auth, auth, '[0/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
-  t.equal(args[1].query, 'error', '[0/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
-  t.ok(/^\d{13}$/.test(args[1].from), '[0/4] createReadStream second parameter should contain \'from\' property with timestamp');
-  t.ok(/^\d{13}$/.test(args[1].to), '[0/4] createReadStream second parameter should contain \'to\' property with timestamp');
-  t.equal(args[1].to - args[1].from, 600000, '[0/4] difference between \'from\' and \'to\' properties should be 10m');
+  args = createReadStream.getCall(1).args;
+  t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
+  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
+  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
+  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
+  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
+  t.equal(args[1].to - args[1].from, 10 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 10m`);
+  count++;
 
   /* --query, --from, and --duration */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', duration: '5m' } });
-  args = createReadStream.getCall(1).args;
-  t.equal(args[0], 'messages', '[1/4] createReadStream first parameter should be \'messages\'');
-  t.deepEqual(args[1].auth, auth, '[1/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
-  t.equal(args[1].query, 'error', '[1/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
-  t.ok(/^\d{13}$/.test(args[1].from), '[1/4] createReadStream second parameter should contain \'from\' property with timestamp');
-  t.ok(/^\d{13}$/.test(args[1].to), '[1/4] createReadStream second parameter should contain \'to\' property with timestamp');
-  t.equal(args[1].to - args[1].from, 300000, '[1/4] difference between \'from\' and \'to\' properties should be 5m');
+  args = createReadStream.getCall(2).args;
+  t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
+  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
+  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
+  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
+  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
+  t.equal(args[1].to - args[1].from, 5 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 5m`);
+  count++;
 
   /* --query, --from, and --to */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', to: '2m' } });
-  args = createReadStream.getCall(2).args;
-  t.equal(args[0], 'messages', '[2/4] createReadStream first parameter should be \'messages\'');
-  t.deepEqual(args[1].auth, auth, '[2/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
-  t.equal(args[1].query, 'error', '[2/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
-  t.ok(/^\d{13}$/.test(args[1].from), '[2/4] createReadStream second parameter should contain \'from\' property with timestamp');
-  t.ok(/^\d{13}$/.test(args[1].to), '[2/4] createReadStream second parameter should contain \'to\' property with timestamp');
-  t.equal(args[1].to - args[1].from, 480000, '[2/4] difference between \'from\' and \'to\' properties should be 8m');
+  args = createReadStream.getCall(3).args;
+  t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
+  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
+  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
+  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
+  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
+  t.equal(args[1].to - args[1].from, 8 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 8m`);
+  count++;
 
   /* --query, --from, and --json */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', json: true } });
-  args = createReadStream.getCall(3).args;
-  t.equal(args[0], 'messages', '[3/4] createReadStream first parameter should be \'messages\'');
-  t.deepEqual(args[1].auth, auth, '[3/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
-  t.equal(args[1].query, 'error', '[3/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
-  t.ok(/^\d{13}$/.test(args[1].from), '[3/4] createReadStream second parameter should contain \'from\' property with timestamp');
-  t.ok(/^\d{13}$/.test(args[1].to), '[3/4] createReadStream second parameter should contain \'to\' property with timestamp');
-  t.equal(args[1].to - args[1].from, 600000, '[3/4] difference between \'from\' and \'to\' properties should be 10m');
+  args = createReadStream.getCall(4).args;
+  t.equal(args[0], 'messages', `[${count}/${total}] createReadStream first parameter should be \'messages\'`);
+  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
+  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
+  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
+  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
+  t.equal(args[1].to - args[1].from, 10 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 10m`);
+  count++;
 
   /* --query, --from, and --grouped */
   file.sumoStream(auth, { flags: { query: 'error', from: '10m', grouped: true } });
-  args = createReadStream.getCall(4).args;
-  t.equal(args[0], 'records', '[4/4] createReadStream first parameter should be \'records\'');
-  t.deepEqual(args[1].auth, auth, '[4/4] createReadStream second parameter should contain \'auth\' property with authentication properties');
-  t.equal(args[1].query, 'error', '[4/4] createReadStream second parameter should contain \'query\' property with \'error\' string');
-  t.ok(/^\d{13}$/.test(args[1].from), '[4/4] createReadStream second parameter should contain \'from\' property with timestamp');
-  t.ok(/^\d{13}$/.test(args[1].to), '[4/4] createReadStream second parameter should contain \'to\' property with timestamp');
-  t.equal(args[1].to - args[1].from, 600000, '[4/4] difference between \'from\' and \'to\' properties should be 10m');
+  args = createReadStream.getCall(5).args;
+  t.equal(args[0], 'records', `[${count}/${total}] createReadStream first parameter should be \'records\'`);
+  t.deepEqual(args[1].auth, auth, `[${count}/${total}] createReadStream second parameter should contain \'auth\' property with authentication properties`);
+  t.equal(args[1].query, 'error', `[${count}/${total}] createReadStream second parameter should contain \'query\' property with \'error\' string`);
+  t.ok(/^\d{13}$/.test(args[1].from), `[${count}/${total}] createReadStream second parameter should contain \'from\' property with timestamp`);
+  t.ok(/^\d{13}$/.test(args[1].to), `[${count}/${total}] createReadStream second parameter should contain \'to\' property with timestamp`);
+  t.equal(args[1].to - args[1].from, 10 * 60 * 1000, `[${count}/${total}] difference between \'from\' and \'to\' properties should be 10m`);
+  count++;
 
   sumo.createReadStream.restore();
   t.end();

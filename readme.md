@@ -124,4 +124,3 @@ The following are required to successfully use the CLI:
 * SUMO_LOGIC_ACCESS_ID environment variable
 * SUMO_LOGIC_ACCESS_KEY environment variable
 * `-q or --query` flag
-* `-f or --from` flag
