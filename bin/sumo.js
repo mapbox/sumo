@@ -5,8 +5,8 @@
 /* eslint-disable no-console */
 
 const meow = require('meow');
-const sumo = require('..');
-const stream = require('stream');
+const sumoStream = require(`${__dirname}/../lib/cli`).sumoStream;
+const validate = require(`${__dirname}/../lib/cli`).validate;
 
 const cli = meow({
   help: `
@@ -36,66 +36,11 @@ const cli = meow({
 }, {
   alias: { q: 'query', f: 'from', t: 'to', g: 'grouped', d: 'duration', j: 'json' },
   boolean: ['grouped', 'all'],
-  string: ['query', 'from', 'to', 'duration']
-});
-
-if (!cli.flags.query || !cli.flags.from) {
-  console.error('ERROR: --query and --from are required');
-  cli.showHelp(1);
-}
-
-const auth = {
-  accessId: process.env.SUMO_LOGIC_ACCESS_ID || process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_ID,
-  accessKey: process.env.SUMO_LOGIC_ACCESS_KEY || process.env.MAPBOX_CLI_SUMOLOGIC_ACCESS_KEY
-};
-
-if (!auth.accessId || !auth.accessKey) {
-  console.error('ERROR: requires environment variables $SUMO_LOGIC_ACCESS_ID and $SUMO_LOGIC_ACCESS_KEY');
-  cli.showHelp(1);
-}
-
-const parseTime = (str) => {
-  const match = str.match(/(\d.*)(\w.*)/);
-  const num = Number(match[1]);
-  const qualifier = match[2];
-  switch (qualifier) {
-    case 's': return num * 1000;
-    case 'm': return num * 60 * 1000;
-    case 'h': return num * 60 * 60 * 1000;
-    case 'd': return num * 24 * 60 * 60 * 1000;
-    default: return null;
-  }
-};
-
-const search = {
-  auth,
-  query: cli.flags.query,
-  from: Date.now() - parseTime(cli.flags.from)
-};
-
-if (cli.flags.duration) {
-  search.to = search.from + parseTime(cli.flags.duration);
-} else if (cli.flags.to) {
-  search.to = Date.now() - parseTime(cli.flags.to);
-} else {
-  search.to = Date.now();
-}
-
-const stringify = new stream.Transform({
-  objectMode: true,
-  transform: function(obj, enc, callback) {
-    if (cli.flags.grouped || cli.flags.json)
-      return callback(null, `${JSON.stringify(obj)}\n`);
-    callback(null, `${obj._raw.trim()}\n`);
+  string: ['query', 'from', 'to', 'duration'],
+  default: {
+    from: '15m'
   }
 });
 
-const results = cli.flags.grouped ?
-  sumo.createReadStream('records', search) :
-  sumo.createReadStream('messages', search);
-
-results
-    .on('error', (err) => console.error(err))
-  .pipe(stringify)
-    .on('error', (err) => console.error(err))
-  .pipe(process.stdout);
+const auth = validate(cli);
+sumoStream(auth, cli);
