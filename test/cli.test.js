@@ -165,7 +165,7 @@ test('[format] string', (t) => {
     res.forEach((r) => {
       t.ok(/^\S.*\S\n$/.test(r), `[${count}/2] should not have leading or trailing whitespaces`);
       try { JSON.parse(r); }
-      catch (err) { t.equal(err.message, 'Unexpected token F', `[${count}/2] not JSON-parsable`); }
+      catch (err) { t.equal(err.message, 'Unexpected token F in JSON at position 1', `[${count}/2] not JSON-parsable`); }
       count++;
     });
     t.end();
