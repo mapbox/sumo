@@ -47,7 +47,7 @@ Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### search
 
-Perform a search limited to less that 100 results. This will return both
+Perform a search limited to less than 100 results. This will return both
 raw messages and aggregate records where applicable. Credentials can be
 provided explicitly, or read from environment variables:
 `SUMO_LOGIC_ACCESS_ID` and `SUMO_LOGIC_ACCESS_KEY`.
