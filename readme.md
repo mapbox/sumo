@@ -1,3 +1,5 @@
+🌇 As of January 2020, this module is deprecated. It is provided as-is, with no warranty. We are not accepting new bugfixes or feature requests at this time.
+
 # sumo
 
 A Node.js SDK for [Sumo Logic's Search Job API](https://help.sumologic.com/APIs/02Search_Job_API/About_the_Search_Job_API)
