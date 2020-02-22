@@ -16,7 +16,6 @@ test('[index] message stream, provided auth', (assert) => {
   auth().then((data) => {
     search.auth = data;
     const readable = sumo.createReadStream('messages', search);
-
     readable.on('data', (msg) => {
       if (messages.has(JSON.stringify(msg)))
         assert.fail(`duplicate message received: ${JSON.stringify(msg)}`);
@@ -67,8 +66,6 @@ test('[index] record stream, auth from env', (assert) => {
       const found = Array.from(records).length;
       const expected = readable.job.status.recordCount;
       assert.ok(found >= expected, `read ${found}/${expected} records`);
-      delete process.env.SUMO_LOGIC_ACCESS_ID;
-      delete process.env.SUMO_LOGIC_ACCESS_KEY;
       assert.end();
     });
   });
@@ -107,8 +104,6 @@ test('[index] search w/callback, auth from env, provided limit', (assert) => {
       assert.ifError(err, 'success');
       assert.equal(data.messages.length, 10, 'returned 10 messages');
       assert.equal(data.records.length, 10, 'returned 10 records');
-      delete process.env.SUMO_LOGIC_ACCESS_ID;
-      delete process.env.SUMO_LOGIC_ACCESS_KEY;
       assert.end();
     });
   });
@@ -130,9 +125,6 @@ test('[index] search w/o aggregation', (assert) => {
       assert.ifError(err, 'success');
       assert.equal(data.messages.length, 10, 'returned 10 messages');
       assert.equal(data.records.length, 0, 'returned 0 records');
-
-      delete process.env.SUMO_LOGIC_ACCESS_ID;
-      delete process.env.SUMO_LOGIC_ACCESS_KEY;
       assert.end();
     });
   });
@@ -154,9 +146,6 @@ test('[index] search with no results', (assert) => {
       assert.ifError(err, 'success');
       assert.equal(data.messages.length, 0, 'returned 0 messages');
       assert.equal(data.records.length, 0, 'returned 0 records');
-
-      delete process.env.SUMO_LOGIC_ACCESS_ID;
-      delete process.env.SUMO_LOGIC_ACCESS_KEY;
       assert.end();
     });
   });

@@ -9,6 +9,9 @@
     "coverage": "nyc --reporter html tape test/*.test.js && opener coverage/index.html",
     "docs": "documentation readme index.js --section=API > /dev/null"
   },
+  "engines": {
+    "node": ">=8.10.0"
+  },
   "bin": {
     "sumo": "bin/sumo.js"
   },
@@ -24,16 +27,16 @@
   "homepage": "https://github.com/mapbox/sumo#readme",
   "devDependencies": {
     "d3-queue": "^3.0.5",
-    "eslint": "^3.16.0",
-    "eslint-plugin-node": "^4.0.1",
-    "nyc": "^10.1.2",
+    "eslint": "^5.2.0",
+    "eslint-plugin-node": "^7.0.1",
+    "nyc": "^12.0.2",
     "opener": "^1.4.3",
-    "sinon": "^2.0.0",
-    "tap-spec": "^4.1.1",
-    "tape": "^4.6.3"
+    "sinon": "^6.1.4",
+    "tap-spec": "^5.0.0",
+    "tape": "^4.9.1"
   },
   "dependencies": {
-    "got": "^6.7.1",
-    "meow": "^3.7.0"
+    "got": "^8.3.2",
+    "meow": "^5.0.0"
   }
 }
